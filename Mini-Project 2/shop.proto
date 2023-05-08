@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+service DistributedBookstore {
+  rpc CreateChain(CreateChainRequest) returns (CreateChainResponse) {}
+  rpc Link(LinkRequest) returns (LinkResponse) {}
+  rpc ListChain(ListChainRequest) returns (ListChainResponse) {}
+
+  rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {}
+  rpc Read(ReadRequest) returns (ReadResponse) {}
+  rpc Write(WriteRequest) returns (WriteResponse) {}
+}
+
+message CreateChainRequest {}
+
+message CreateChainResponse {
+  repeated string process_list = 1;
+}
+
+message LinkRequest {
+  string head = 1;
+  string tail = 2;
+  repeated Node nodes = 3;
+}
+
+message Node {
+  string process_id = 1;
+  string successor_id = 2;
+}
+
+message LinkResponse {}
+
+message ListChainRequest {
+  string process_id = 1;
+}
+
+message ListChainResponse {
+  repeated string process_list = 1;
+}
+
+message Book {
+  string name = 1;
+  double price = 2;
+}
+
+message ListBooksRequest {}
+
+message ListBooksResponse {
+  repeated Book books = 1;
+}
+
+message ReadRequest {
+  string name = 1;
+}
+
+message ReadResponse {
+  Book book = 1;
+}
+
+message WriteRequest {
+  string name = 1;
+  double price = 2;
+}
+
+message WriteResponse {}
