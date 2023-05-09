@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nshop.proto\"\x14\n\x12\x43reateChainRequest\"+\n\x13\x43reateChainResponse\x12\x14\n\x0cprocess_list\x18\x01 \x03(\t\"J\n\x0bLinkRequest\x12\x0c\n\x04head\x18\x01 \x01(\t\x12\x0c\n\x04tail\x18\x02 \x01(\t\x12\x1f\n\x0b\x63hain_nodes\x18\x03 \x03(\x0b\x32\n.ChainNode\"M\n\tChainNode\x12\x12\n\nprocess_id\x18\x01 \x01(\t\x12\x14\n\x0csuccessor_id\x18\x02 \x01(\t\x12\x16\n\x0epredecessor_id\x18\x03 \x01(\t\"\x0e\n\x0cLinkResponse\"\x12\n\x10ListChainRequest\"4\n\x11ListChainResponse\x12\x1f\n\x0b\x63hain_nodes\x18\x01 \x03(\x0b\x32\n.ChainNode\"#\n\x04\x42ook\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05price\x18\x02 \x01(\x01\"\x12\n\x10ListBooksRequest\")\n\x11ListBooksResponse\x12\x14\n\x05\x62ooks\x18\x01 \x03(\x0b\x32\x05.Book\"\x1b\n\x0bReadRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"#\n\x0cReadResponse\x12\x13\n\x04\x62ook\x18\x01 \x01(\x0b\x32\x05.Book\"+\n\x0cWriteRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05price\x18\x02 \x01(\x01\"\x0f\n\rWriteResponse2\xb6\x02\n\x14\x44istributedBookstore\x12:\n\x0b\x43reateChain\x12\x13.CreateChainRequest\x1a\x14.CreateChainResponse\"\x00\x12%\n\x04Link\x12\x0c.LinkRequest\x1a\r.LinkResponse\"\x00\x12\x34\n\tListChain\x12\x11.ListChainRequest\x1a\x12.ListChainResponse\"\x00\x12\x34\n\tListBooks\x12\x11.ListBooksRequest\x1a\x12.ListBooksResponse\"\x00\x12%\n\x04Read\x12\x0c.ReadRequest\x1a\r.ReadResponse\"\x00\x12(\n\x05Write\x12\r.WriteRequest\x1a\x0e.WriteResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nshop.proto\"\x14\n\x12\x43reateChainRequest\"+\n\x13\x43reateChainResponse\x12\x14\n\x0cprocess_list\x18\x01 \x03(\t\"J\n\x0bLinkRequest\x12\x0c\n\x04head\x18\x01 \x01(\t\x12\x0c\n\x04tail\x18\x02 \x01(\t\x12\x1f\n\x0b\x63hain_nodes\x18\x03 \x03(\x0b\x32\n.ChainNode\"M\n\tChainNode\x12\x12\n\nprocess_id\x18\x01 \x01(\t\x12\x14\n\x0csuccessor_id\x18\x02 \x01(\t\x12\x16\n\x0epredecessor_id\x18\x03 \x01(\t\"\x0e\n\x0cLinkResponse\"\x12\n\x10ListChainRequest\"4\n\x11ListChainResponse\x12\x1f\n\x0b\x63hain_nodes\x18\x01 \x03(\x0b\x32\n.ChainNode\"#\n\x04\x42ook\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05price\x18\x02 \x01(\x01\"\x12\n\x10ListBooksRequest\")\n\x11ListBooksResponse\x12\x14\n\x05\x62ooks\x18\x01 \x03(\x0b\x32\x05.Book\"\x1b\n\x0bReadRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"#\n\x0cReadResponse\x12\x13\n\x04\x62ook\x18\x01 \x01(\x0b\x32\x05.Book\"?\n\x0cWriteRequest\x12\x12\n\nprocess_id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\r\n\x05price\x18\x03 \x01(\x01\"\x0f\n\rWriteResponse\"7\n\x0c\x43leanRequest\x12\x12\n\nprocess_id\x18\x01 \x01(\t\x12\x13\n\x04\x62ook\x18\x02 \x01(\x0b\x32\x05.Book\"\x0f\n\rCleanResponse2\xe0\x02\n\x14\x44istributedBookstore\x12:\n\x0b\x43reateChain\x12\x13.CreateChainRequest\x1a\x14.CreateChainResponse\"\x00\x12%\n\x04Link\x12\x0c.LinkRequest\x1a\r.LinkResponse\"\x00\x12\x34\n\tListChain\x12\x11.ListChainRequest\x1a\x12.ListChainResponse\"\x00\x12\x34\n\tListBooks\x12\x11.ListBooksRequest\x1a\x12.ListBooksResponse\"\x00\x12%\n\x04Read\x12\x0c.ReadRequest\x1a\r.ReadResponse\"\x00\x12(\n\x05Write\x12\r.WriteRequest\x1a\x0e.WriteResponse\"\x00\x12(\n\x05\x43lean\x12\r.CleanRequest\x1a\x0e.CleanResponse\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'shop_pb2', globals())
@@ -45,9 +45,13 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _READRESPONSE._serialized_start=455
   _READRESPONSE._serialized_end=490
   _WRITEREQUEST._serialized_start=492
-  _WRITEREQUEST._serialized_end=535
-  _WRITERESPONSE._serialized_start=537
-  _WRITERESPONSE._serialized_end=552
-  _DISTRIBUTEDBOOKSTORE._serialized_start=555
-  _DISTRIBUTEDBOOKSTORE._serialized_end=865
+  _WRITEREQUEST._serialized_end=555
+  _WRITERESPONSE._serialized_start=557
+  _WRITERESPONSE._serialized_end=572
+  _CLEANREQUEST._serialized_start=574
+  _CLEANREQUEST._serialized_end=629
+  _CLEANRESPONSE._serialized_start=631
+  _CLEANRESPONSE._serialized_end=646
+  _DISTRIBUTEDBOOKSTORE._serialized_start=649
+  _DISTRIBUTEDBOOKSTORE._serialized_end=1001
 # @@protoc_insertion_point(module_scope)

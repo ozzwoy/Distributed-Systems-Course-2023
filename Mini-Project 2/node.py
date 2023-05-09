@@ -1,12 +1,13 @@
 import config
-import grpc
-import random
 import shop_pb2
 import shop_pb2_grpc
 
+import grpc
+import random
+import threading
+
 from concurrent import futures
 from model.entities import *
-from threading import Thread
 
 
 class Node(shop_pb2_grpc.DistributedBookstoreServicer):
@@ -17,6 +18,7 @@ class Node(shop_pb2_grpc.DistributedBookstoreServicer):
         self.head_node_id = None
         self.tail = None
         self.tail_node_id = None
+        self.timeout = 0
 
     def CreateChain(self, request, context):
         return shop_pb2.CreateChainResponse(process_list=[p.id for p in self.ids_to_processes.values()])
@@ -40,6 +42,45 @@ class Node(shop_pb2_grpc.DistributedBookstoreServicer):
         return shop_pb2.ListChainResponse(chain_nodes=[shop_pb2.ChainNode(process_id=p.id, successor_id=p.successor,
                                                                           predecessor_id=p.predecessor)
                                                        for p in self.ids_to_processes.values()])
+
+    def ListBooks(self, request, context):
+        return shop_pb2.ListBooksResponse(books=[shop_pb2.Book(name=entry.book.name, price=entry.book.price) for entry
+                                                 in self.ids_to_processes[self.tail].store.data])
+
+    def Read(self, request, context):
+        # this request is supposed to be responded by the tail
+        books = [entry.book for entry in self.ids_to_processes[self.tail].store.data]
+        found = next((book for book in books if book.name == request.name), None)
+
+        if found is not None:
+            return shop_pb2.ReadResponse(book=shop_pb2.Book(name=found.name, price=found.price))
+        else:
+            return shop_pb2.ReadResponse(book=shop_pb2.Book(name='', price=0))
+
+    def Write(self, request, context):
+        process = self.ids_to_processes[request.process_id]
+        book = Book(request.name, request.price)
+        process.store.add(book)
+
+        if process.successor is not None:
+            threading.Timer(self.timeout, self.write_func, args=[process.successor, book])
+        else:
+            process.store.make_clean(book.name)
+            threading.Timer(0, self.clean_func, args=[process.predecessor, book])
+
+        return shop_pb2.WriteResponse()
+
+    def Clean(self, request, context):
+        process = self.ids_to_processes[request.process_id]
+        found = next((entry.book for entry in process.store.data if entry.book.name == request.book.name), None)
+
+        if found is not None and found.price == request.book.price:
+            found.clean = True
+
+            if process.predecessor is not None:
+                threading.Timer(self.timeout, self.clean_func, args=[process.predecessor, found.book])
+
+        return shop_pb2.CleanResponse()
 
     def init_processes(self, n):
         for i in range(n):
@@ -113,6 +154,49 @@ class Node(shop_pb2_grpc.DistributedBookstoreServicer):
 
         return ' -> '.join(result)
 
+    def list_books(self):
+        # we must not return dirty data, so we ask the tail to provide the clean data
+        with grpc.insecure_channel(config.IDS_TO_IPS[self.tail_node_id]) as channel:
+            stub = shop_pb2_grpc.DistributedBookstoreStub(channel)
+            response = stub.ListBooks(shop_pb2.ListBooksRequest())
+
+        return [Book(book.name, book.price) for book in response.books]
+
+    def read(self, name):
+        entries = list(self.ids_to_processes.values())[0].store.data
+        found = next((entry for entry in entries if entry.book.name == name), None)
+
+        if found is None:
+            return None
+        elif found.clean:
+            return found.book
+        else:
+            # we must not return dirty data, so we ask the tail to provide the clean data
+            with grpc.insecure_channel(config.IDS_TO_IPS[self.tail_node_id]) as channel:
+                stub = shop_pb2_grpc.DistributedBookstoreStub(channel)
+                response = stub.Read(shop_pb2.ReadRequest(name=name))
+
+            return Book(response.name, response.price)
+
+    def write(self, book):
+        # start the chain of replication of the head
+        self.write_func(self.head, book)
+
+    def write_func(self, process_id, book):
+        node = int(process_id[4])
+        with grpc.insecure_channel(config.IDS_TO_IPS[node]) as channel:
+            stub = shop_pb2_grpc.DistributedBookstoreStub(channel)
+            stub.Write(shop_pb2.WriteRequest(process_id=process_id, name=book.name, price=book.price))
+
+    def clean_func(self, process_id, book):
+        node = int(process_id[4])
+        with grpc.insecure_channel(config.IDS_TO_IPS[node]) as channel:
+            stub = shop_pb2_grpc.DistributedBookstoreStub(channel)
+            stub.Clean(shop_pb2.CleanRequest(process_id=process_id, book=shop_pb2.Book(name=book.name, price=book.price)))
+
+    def data_status(self):
+        return list(self.ids_to_processes.values())[0].store.data
+
 
 def serve():
     node_id = int(input('Enter node id: '))
@@ -145,9 +229,33 @@ def serve():
                     print('Wrong command! Please try again.')
         elif command[0] == 'List-chain':
             print(node.list_chain())
-        elif command[0] == 'Show-processes':
-            for p in node.ids_to_processes.values():
-                print(f'{p.id} -> {p.successor}')
+        elif command[0] == 'List-books':
+            books = node.list_books()
+            for i, book in enumerate(books):
+                print(f'{i}) {book.name} = {round(book.price, 1)} EUR')
+            else:
+                print('No books yet in the stock.')
+        elif command[0] == 'Read-operation':
+            command = ''.join(command[1:])
+            name = command[1:-1]
+            book = node.read(name)
+            if book is not None:
+                print(f'{round(book.price, 1)} EUR')
+            else:
+                print('Not yet in the stock.')
+        elif command[0] == 'Write-operation':
+            command = ''.join(command[1:])
+            command = command.split('"')
+            name = command[1]
+            price = round(float(command[2][2:-1]), 1)
+            node.write(Book(name, price))
+        elif command[0] == 'Time-out':
+            timeout = int(command[1])
+            node.timeout = timeout
+        elif command[0] == 'Data-status':
+            data = node.data_status()
+            for i, entry in enumerate(data):
+                print(f'{i}) {entry.book.name} -- {"clean" if entry.clean else "dirty"}')
         else:
             print('Wrong command! Please try again.')
 
