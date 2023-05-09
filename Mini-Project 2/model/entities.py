@@ -37,3 +37,7 @@ class Process:
         self.id = 'Node' + str(node) + '-ps' + str(number)
         self.store = Store()
         self.successor = None
+        self.predecessor = None
+
+    def clear_store(self):
+        self.store = Store()

@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nshop.proto\"\x14\n\x12\x43reateChainRequest\"+\n\x13\x43reateChainResponse\x12\x14\n\x0cprocess_list\x18\x01 \x03(\t\"?\n\x0bLinkRequest\x12\x0c\n\x04head\x18\x01 \x01(\t\x12\x0c\n\x04tail\x18\x02 \x01(\t\x12\x14\n\x05nodes\x18\x03 \x03(\x0b\x32\x05.Node\"0\n\x04Node\x12\x12\n\nprocess_id\x18\x01 \x01(\t\x12\x14\n\x0csuccessor_id\x18\x02 \x01(\t\"\x0e\n\x0cLinkResponse\"\x12\n\x10ListChainRequest\")\n\x11ListChainResponse\x12\x14\n\x0cprocess_list\x18\x01 \x03(\t\"#\n\x04\x42ook\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05price\x18\x02 \x01(\x01\"\x12\n\x10ListBooksRequest\")\n\x11ListBooksResponse\x12\x14\n\x05\x62ooks\x18\x01 \x03(\x0b\x32\x05.Book\"\x1b\n\x0bReadRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"#\n\x0cReadResponse\x12\x13\n\x04\x62ook\x18\x01 \x01(\x0b\x32\x05.Book\"+\n\x0cWriteRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05price\x18\x02 \x01(\x01\"\x0f\n\rWriteResponse2\xb6\x02\n\x14\x44istributedBookstore\x12:\n\x0b\x43reateChain\x12\x13.CreateChainRequest\x1a\x14.CreateChainResponse\"\x00\x12%\n\x04Link\x12\x0c.LinkRequest\x1a\r.LinkResponse\"\x00\x12\x34\n\tListChain\x12\x11.ListChainRequest\x1a\x12.ListChainResponse\"\x00\x12\x34\n\tListBooks\x12\x11.ListBooksRequest\x1a\x12.ListBooksResponse\"\x00\x12%\n\x04Read\x12\x0c.ReadRequest\x1a\r.ReadResponse\"\x00\x12(\n\x05Write\x12\r.WriteRequest\x1a\x0e.WriteResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nshop.proto\"\x14\n\x12\x43reateChainRequest\"+\n\x13\x43reateChainResponse\x12\x14\n\x0cprocess_list\x18\x01 \x03(\t\"J\n\x0bLinkRequest\x12\x0c\n\x04head\x18\x01 \x01(\t\x12\x0c\n\x04tail\x18\x02 \x01(\t\x12\x1f\n\x0b\x63hain_nodes\x18\x03 \x03(\x0b\x32\n.ChainNode\"M\n\tChainNode\x12\x12\n\nprocess_id\x18\x01 \x01(\t\x12\x14\n\x0csuccessor_id\x18\x02 \x01(\t\x12\x16\n\x0epredecessor_id\x18\x03 \x01(\t\"\x0e\n\x0cLinkResponse\"\x12\n\x10ListChainRequest\"4\n\x11ListChainResponse\x12\x1f\n\x0b\x63hain_nodes\x18\x01 \x03(\x0b\x32\n.ChainNode\"#\n\x04\x42ook\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05price\x18\x02 \x01(\x01\"\x12\n\x10ListBooksRequest\")\n\x11ListBooksResponse\x12\x14\n\x05\x62ooks\x18\x01 \x03(\x0b\x32\x05.Book\"\x1b\n\x0bReadRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"#\n\x0cReadResponse\x12\x13\n\x04\x62ook\x18\x01 \x01(\x0b\x32\x05.Book\"+\n\x0cWriteRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05price\x18\x02 \x01(\x01\"\x0f\n\rWriteResponse2\xb6\x02\n\x14\x44istributedBookstore\x12:\n\x0b\x43reateChain\x12\x13.CreateChainRequest\x1a\x14.CreateChainResponse\"\x00\x12%\n\x04Link\x12\x0c.LinkRequest\x1a\r.LinkResponse\"\x00\x12\x34\n\tListChain\x12\x11.ListChainRequest\x1a\x12.ListChainResponse\"\x00\x12\x34\n\tListBooks\x12\x11.ListBooksRequest\x1a\x12.ListBooksResponse\"\x00\x12%\n\x04Read\x12\x0c.ReadRequest\x1a\r.ReadResponse\"\x00\x12(\n\x05Write\x12\r.WriteRequest\x1a\x0e.WriteResponse\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'shop_pb2', globals())
@@ -25,29 +25,29 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _CREATECHAINRESPONSE._serialized_start=36
   _CREATECHAINRESPONSE._serialized_end=79
   _LINKREQUEST._serialized_start=81
-  _LINKREQUEST._serialized_end=144
-  _NODE._serialized_start=146
-  _NODE._serialized_end=194
-  _LINKRESPONSE._serialized_start=196
-  _LINKRESPONSE._serialized_end=210
-  _LISTCHAINREQUEST._serialized_start=212
-  _LISTCHAINREQUEST._serialized_end=230
-  _LISTCHAINRESPONSE._serialized_start=232
-  _LISTCHAINRESPONSE._serialized_end=273
-  _BOOK._serialized_start=275
-  _BOOK._serialized_end=310
-  _LISTBOOKSREQUEST._serialized_start=312
-  _LISTBOOKSREQUEST._serialized_end=330
-  _LISTBOOKSRESPONSE._serialized_start=332
-  _LISTBOOKSRESPONSE._serialized_end=373
-  _READREQUEST._serialized_start=375
-  _READREQUEST._serialized_end=402
-  _READRESPONSE._serialized_start=404
-  _READRESPONSE._serialized_end=439
-  _WRITEREQUEST._serialized_start=441
-  _WRITEREQUEST._serialized_end=484
-  _WRITERESPONSE._serialized_start=486
-  _WRITERESPONSE._serialized_end=501
-  _DISTRIBUTEDBOOKSTORE._serialized_start=504
-  _DISTRIBUTEDBOOKSTORE._serialized_end=814
+  _LINKREQUEST._serialized_end=155
+  _CHAINNODE._serialized_start=157
+  _CHAINNODE._serialized_end=234
+  _LINKRESPONSE._serialized_start=236
+  _LINKRESPONSE._serialized_end=250
+  _LISTCHAINREQUEST._serialized_start=252
+  _LISTCHAINREQUEST._serialized_end=270
+  _LISTCHAINRESPONSE._serialized_start=272
+  _LISTCHAINRESPONSE._serialized_end=324
+  _BOOK._serialized_start=326
+  _BOOK._serialized_end=361
+  _LISTBOOKSREQUEST._serialized_start=363
+  _LISTBOOKSREQUEST._serialized_end=381
+  _LISTBOOKSRESPONSE._serialized_start=383
+  _LISTBOOKSRESPONSE._serialized_end=424
+  _READREQUEST._serialized_start=426
+  _READREQUEST._serialized_end=453
+  _READRESPONSE._serialized_start=455
+  _READRESPONSE._serialized_end=490
+  _WRITEREQUEST._serialized_start=492
+  _WRITEREQUEST._serialized_end=535
+  _WRITERESPONSE._serialized_start=537
+  _WRITERESPONSE._serialized_end=552
+  _DISTRIBUTEDBOOKSTORE._serialized_start=555
+  _DISTRIBUTEDBOOKSTORE._serialized_end=865
 # @@protoc_insertion_point(module_scope)

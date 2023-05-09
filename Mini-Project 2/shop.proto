@@ -19,22 +19,21 @@ message CreateChainResponse {
 message LinkRequest {
   string head = 1;
   string tail = 2;
-  repeated Node nodes = 3;
+  repeated ChainNode chain_nodes = 3;
 }
 
-message Node {
+message ChainNode {
   string process_id = 1;
   string successor_id = 2;
+  string predecessor_id = 3;
 }
 
 message LinkResponse {}
 
-message ListChainRequest {
-  string process_id = 1;
-}
+message ListChainRequest {}
 
 message ListChainResponse {
-  repeated string process_list = 1;
+  repeated ChainNode chain_nodes = 1;
 }
 
 message Book {
