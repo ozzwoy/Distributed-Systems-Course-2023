@@ -9,6 +9,7 @@ service DistributedBookstore {
   rpc Read(ReadRequest) returns (ReadResponse) {}
   rpc Write(WriteRequest) returns (WriteResponse) {}
   rpc Clean(CleanRequest) returns (CleanResponse) {}
+  rpc SetTimeout (SetTimeoutRequest) returns (SetTimeoutResponse) {}
 }
 
 message CreateChainRequest {}
@@ -70,3 +71,9 @@ message CleanRequest {
 }
 
 message CleanResponse {}
+
+message SetTimeoutRequest {
+  int32 timeout = 1;
+}
+
+message SetTimeoutResponse {}

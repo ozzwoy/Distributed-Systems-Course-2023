@@ -49,6 +49,11 @@ class DistributedBookstoreStub(object):
                 request_serializer=shop__pb2.CleanRequest.SerializeToString,
                 response_deserializer=shop__pb2.CleanResponse.FromString,
                 )
+        self.SetTimeout = channel.unary_unary(
+                '/DistributedBookstore/SetTimeout',
+                request_serializer=shop__pb2.SetTimeoutRequest.SerializeToString,
+                response_deserializer=shop__pb2.SetTimeoutResponse.FromString,
+                )
 
 
 class DistributedBookstoreServicer(object):
@@ -96,6 +101,12 @@ class DistributedBookstoreServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SetTimeout(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_DistributedBookstoreServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -133,6 +144,11 @@ def add_DistributedBookstoreServicer_to_server(servicer, server):
                     servicer.Clean,
                     request_deserializer=shop__pb2.CleanRequest.FromString,
                     response_serializer=shop__pb2.CleanResponse.SerializeToString,
+            ),
+            'SetTimeout': grpc.unary_unary_rpc_method_handler(
+                    servicer.SetTimeout,
+                    request_deserializer=shop__pb2.SetTimeoutRequest.FromString,
+                    response_serializer=shop__pb2.SetTimeoutResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -260,5 +276,22 @@ class DistributedBookstore(object):
         return grpc.experimental.unary_unary(request, target, '/DistributedBookstore/Clean',
             shop__pb2.CleanRequest.SerializeToString,
             shop__pb2.CleanResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SetTimeout(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/DistributedBookstore/SetTimeout',
+            shop__pb2.SetTimeoutRequest.SerializeToString,
+            shop__pb2.SetTimeoutResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

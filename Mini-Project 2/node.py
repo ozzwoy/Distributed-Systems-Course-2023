@@ -63,24 +63,31 @@ class Node(shop_pb2_grpc.DistributedBookstoreServicer):
         process.store.add(book)
 
         if process.successor is not None:
-            threading.Timer(self.timeout, self.write_func, args=[process.successor, book])
+            timer = threading.Timer(self.timeout, self.write_func, args=[process.successor, book])
         else:
             process.store.make_clean(book.name)
-            threading.Timer(0, self.clean_func, args=[process.predecessor, book])
+            timer = threading.Timer(0, self.clean_func, args=[process.predecessor, book])
+        timer.start()
 
         return shop_pb2.WriteResponse()
 
     def Clean(self, request, context):
         process = self.ids_to_processes[request.process_id]
-        found = next((entry.book for entry in process.store.data if entry.book.name == request.book.name), None)
+        found = next((entry for entry in process.store.data if entry.book.name == request.book.name), None)
 
-        if found is not None and found.price == request.book.price:
+        if found is not None and found.book.price == request.book.price:
             found.clean = True
 
             if process.predecessor is not None:
-                threading.Timer(self.timeout, self.clean_func, args=[process.predecessor, found.book])
+                timer = threading.Timer(self.timeout, self.clean_func, args=[process.predecessor, found.book])
+                timer.start()
 
         return shop_pb2.CleanResponse()
+
+    def SetTimeout(self, request, context):
+        self.timeout = request.timeout
+
+        return shop_pb2.SetTimeoutResponse()
 
     def init_processes(self, n):
         for i in range(n):
@@ -176,7 +183,7 @@ class Node(shop_pb2_grpc.DistributedBookstoreServicer):
                 stub = shop_pb2_grpc.DistributedBookstoreStub(channel)
                 response = stub.Read(shop_pb2.ReadRequest(name=name))
 
-            return Book(response.name, response.price)
+            return Book(response.book.name, response.book.price)
 
     def write(self, book):
         # start the chain of replication of the head
@@ -194,8 +201,14 @@ class Node(shop_pb2_grpc.DistributedBookstoreServicer):
             stub = shop_pb2_grpc.DistributedBookstoreStub(channel)
             stub.Clean(shop_pb2.CleanRequest(process_id=process_id, book=shop_pb2.Book(name=book.name, price=book.price)))
 
-    def data_status(self):
-        return list(self.ids_to_processes.values())[0].store.data
+    def set_timeout(self, timeout):
+        for node in config.IDS_TO_IPS.values():
+            with grpc.insecure_channel(node) as channel:
+                stub = shop_pb2_grpc.DistributedBookstoreStub(channel)
+                stub.SetTimeout(shop_pb2.SetTimeoutRequest(timeout=timeout))
+
+    def data_status(self, i):
+        return list(self.ids_to_processes.values())[i].store.data
 
 
 def serve():
@@ -232,11 +245,11 @@ def serve():
         elif command[0] == 'List-books':
             books = node.list_books()
             for i, book in enumerate(books):
-                print(f'{i}) {book.name} = {round(book.price, 1)} EUR')
-            else:
+                print(f'{i + 1}) {book.name} = {round(book.price, 1)} EUR')
+            if len(books) == 0:
                 print('No books yet in the stock.')
         elif command[0] == 'Read-operation':
-            command = ''.join(command[1:])
+            command = ' '.join(command[1:])
             name = command[1:-1]
             book = node.read(name)
             if book is not None:
@@ -244,18 +257,19 @@ def serve():
             else:
                 print('Not yet in the stock.')
         elif command[0] == 'Write-operation':
-            command = ''.join(command[1:])
+            command = ' '.join(command[1:])
             command = command.split('"')
             name = command[1]
             price = round(float(command[2][2:-1]), 1)
             node.write(Book(name, price))
         elif command[0] == 'Time-out':
             timeout = int(command[1])
-            node.timeout = timeout
+            node.set_timeout(timeout)
         elif command[0] == 'Data-status':
-            data = node.data_status()
+            p = int(command[1]) - 1
+            data = node.data_status(p)
             for i, entry in enumerate(data):
-                print(f'{i}) {entry.book.name} -- {"clean" if entry.clean else "dirty"}')
+                print(f'{i + 1}) {entry.book.name} -- {"clean" if entry.clean else "dirty"}')
         else:
             print('Wrong command! Please try again.')
 

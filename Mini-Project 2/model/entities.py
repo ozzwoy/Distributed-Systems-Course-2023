@@ -21,9 +21,9 @@ class Store:
             if entry.book.name == book.name:
                 entry.book.price = book.price
                 entry.clean = False
-                break
-        else:
-            self.data.append(self.Entry(book, False))
+                return
+
+        self.data.append(self.Entry(book, False))
 
     def make_clean(self, name):
         for entry in self.data:
