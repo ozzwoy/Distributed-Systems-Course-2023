@@ -89,6 +89,15 @@ class Node(shop_pb2_grpc.DistributedBookstoreServicer):
 
         return shop_pb2.SetTimeoutResponse()
 
+    def RemoveHead(self, request, context):
+        self.head = request.new_head
+        new_head_node = int(self.head[4])
+
+        if self.id == new_head_node:
+            self.ids_to_processes[self.head].predecessor = None
+
+        return shop_pb2.RemoveHeadResponse()
+
     def init_processes(self, n):
         for i in range(n):
             process = Process(node=self.id, number=i + 1)
@@ -156,10 +165,7 @@ class Node(shop_pb2_grpc.DistributedBookstoreServicer):
             result.append(current.process_id)
             current = next((node for node in chain_nodes if node.process_id == current.successor_id), None)
 
-        result[0] += '(Head)'
-        result[-1] += '(Tail)'
-
-        return ' -> '.join(result)
+        return result
 
     def list_books(self):
         # we must not return dirty data, so we ask the tail to provide the clean data
@@ -210,6 +216,15 @@ class Node(shop_pb2_grpc.DistributedBookstoreServicer):
     def data_status(self, i):
         return list(self.ids_to_processes.values())[i].store.data
 
+    def remove_head(self):
+        chain = self.list_chain()
+        new_head = chain[1]
+
+        for node in config.IDS_TO_IPS.values():
+            with grpc.insecure_channel(node) as channel:
+                stub = shop_pb2_grpc.DistributedBookstoreStub(channel)
+                stub.RemoveHead(shop_pb2.RemoveHeadRequest(new_head=new_head))
+
 
 def serve():
     node_id = int(input('Enter node id: '))
@@ -241,7 +256,10 @@ def serve():
                 else:
                     print('Wrong command! Please try again.')
         elif command[0] == 'List-chain':
-            print(node.list_chain())
+            chain = node.list_chain()
+            chain[0] += '(Head)'
+            chain[-1] += '(Tail)'
+            print(' -> '.join(chain))
         elif command[0] == 'List-books':
             books = node.list_books()
             for i, book in enumerate(books):
@@ -270,6 +288,8 @@ def serve():
             data = node.data_status(p)
             for i, entry in enumerate(data):
                 print(f'{i + 1}) {entry.book.name} -- {"clean" if entry.clean else "dirty"}')
+        elif command[0] == 'Remove-head':
+            node.remove_head()
         else:
             print('Wrong command! Please try again.')
 
